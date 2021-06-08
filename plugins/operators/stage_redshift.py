@@ -11,8 +11,7 @@ class StageToRedshiftOperator(BaseOperator):
         FROM '{}'
         ACCESS_KEY_ID '{}'
         SECRET_ACCESS_KEY '{}'
-        IGNOREHEADER {}
-        JSON 'auto' region 'us-west-2'
+        FORMAT AS JSON '{}'
     """
 
     @apply_defaults
@@ -22,7 +21,7 @@ class StageToRedshiftOperator(BaseOperator):
                  table="",
                  s3_bucket="",
                  s3_key="",
-                 ignore_headers= True,
+                 s3_json_path="auto",
                  *args, **kwargs):
 
         super(StageToRedshiftOperator, self).__init__(*args, **kwargs)
@@ -31,10 +30,10 @@ class StageToRedshiftOperator(BaseOperator):
         self.table = table
         self.s3_bucket = s3_bucket
         self.s3_key = s3_key
-        self.ignore_headers = ignore_headers
+        self.s3_json_path = s3_json_path
 
     def execute(self, context):
-        self.log.info('StageToRedshiftOperator not implemented yet')
+        self.log.info('StageToRedshiftOperator start')
         aws_hook = AwsHook(self.aws_credentials_id)
         credentials = aws_hook.get_credentials()
 
@@ -47,7 +46,7 @@ class StageToRedshiftOperator(BaseOperator):
         rendered_key = self.s3_key.format(**context)
 
         #test print 
-        self.log.info(f"faycal udacity test : renderd_key = {rendered_key}, s3_key = {self.s3_key},context = {context}")
+        #self.log.info(f"faycal udacity test : renderd_key = {rendered_key}, s3_key = {self.s3_key},context = {context}")
         
         
         s3_path = "s3://{}/{}".format(self.s3_bucket, rendered_key)
@@ -56,10 +55,10 @@ class StageToRedshiftOperator(BaseOperator):
             s3_path,
             credentials.access_key,
             credentials.secret_key,
-            self.ignore_headers
+            self.s3_json_path
         )
         redshift.run(formatted_sql)
-
+        self.log.info('StageToRedshiftOperator ended')
 
 
 

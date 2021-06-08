@@ -21,10 +21,11 @@ class LoadDimensionOperator(BaseOperator):
         self.append = append
 
     def execute(self, context):
-        self.log.info('LoadDimensionOperator not implemented yet')
+        self.log.info('LoadDimensionOperator start')
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         if(not self.append):
             self.log.info('LoadDimensionOperator append is {}'.format(self.append))
             redshift.run("DELETE FROM {}".format(self.table))
         self.log.info('LoadDimensionOperator insert data in : {}'.format(self.table))
         redshift.run(self.sql)
+        self.log.info('LoadDimensionOperator ended')

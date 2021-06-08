@@ -22,10 +22,11 @@ class LoadFactOperator(BaseOperator):
 
 
     def execute(self, context):
-        self.log.info('LoadFactOperator not implemented yet')
+        self.log.info('LoadFactOperator started')
         redshift = PostgresHook(postgres_conn_id=self.redshift_conn_id)
         if(not self.append):
             self.log.info('LoadFactOperator append is {}'.format(self.append))
             redshift.run("DELETE FROM {}".format(self.table))
         self.log.info('LoadFactOperator insert data in : {}'.format(self.table))
         redshift.run(self.sql)
+        self.log.info('LoadFactOperator ended')
